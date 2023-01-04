@@ -27,6 +27,7 @@ const GlobalStyle = createGlobalStyle`
   * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
   
   }
   body {
@@ -48,6 +49,15 @@ const GlobalStyle = createGlobalStyle`
     font-family: inherit;
     font-size: inherit;
   }
+  textarea:focus {
+  outline: none;
+  }
+  button:focus {
+  outline: none;
+  }
+  input:focus {
+  outline: none;
+  }
   a {
     color: inherit;
     text-decoration: none;
@@ -67,7 +77,7 @@ const GlobalStyle = createGlobalStyle`
     -moz-user-select: -moz-none;
     -khtml-user-select: none;
     -webkit-user-select: none;
-    user-select: none;
+      user-select: none;
   }
   input, textarea {
     -webkit-user-select: text;
