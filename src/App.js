@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import Modal from "./components/Modal";
-import { kanbanBoardData } from "./recoil/atoms";
 
 const Main = styled.div`
   display: flex;
@@ -15,10 +13,10 @@ const Main = styled.div`
 const Issue = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 1000px;
   height: 400px;
   border: 1px solid black;
-  padding: 10px;
 `;
 
 const Title = styled.span`
@@ -35,6 +33,19 @@ const Boards = styled.div`
   gap: 10px;
   margin-bottom: 100px;
 `;
+
+const BoardTitle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid black;
+  background-color: var(--primary-100);
+  width: 200px;
+  `;
+
 const BoardItem = styled.div`
   display: flex;
   justify-content: center;
@@ -50,6 +61,7 @@ const InputModalBtn = styled.button`
   align-items: center;
   width: 100px;
   padding: 10px;
+  margin: 10px;
   border: 1px solid black;
   background-color: var(--primary-100);
   cursor: pointer;
@@ -177,7 +189,7 @@ function App() {
                 onDragOver={(e) => dragOverHandler(e)}
                 onDrop={(e) => dropCardHandle(e, board)}
               >
-                <div>{board.title}</div>
+                <BoardTitle>{board.title}</BoardTitle>
                 {board.items.map((item, index) => (
                   <BoardItem
                     key={index}
