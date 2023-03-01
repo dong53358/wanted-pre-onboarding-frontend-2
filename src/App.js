@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import BoardItem from "./components/BoardItem";
 import Modal from "./components/Modal";
 import { initialIssueList } from "./data";
 
@@ -30,27 +31,23 @@ function App() {
     <Main>
       <Issue>
         <Title>Issue</Title>
-
-        {
-          <Boards>
-            {initialIssueList.map((issuelist, index) => (
-              <div key={index} className="board">
-                <InputModalBtn onClick={() => modalOpen(issuelist?.title)}>
-                  + 추가
-                </InputModalBtn>
-                <BoardTitle>{issuelist.title}</BoardTitle>
+        <Boards>
+          {issueList.map((issuelist, index) => (
+            <Board key={index}>
+              <InputModalBtn onClick={() => modalOpen(issuelist?.title)}>
+                + 추가
+              </InputModalBtn>
+              <BoardTitle>{issuelist.title}</BoardTitle>
+              <ul>
                 {issuelist.items.map((item, index) => (
-                  <BoardItem
-                    key={index}
-                    issue={item}
-                    issuelist={issuelist}
-                    className="item"
-                  />
+                  <BoardItem key={index} item={item} className="item">
+                    {item.title}
+                  </BoardItem>
                 ))}
-              </div>
-            ))}
-          </Boards>
-        }
+              </ul>
+            </Board>
+          ))}
+        </Boards>
       </Issue>
       <ModalArea>
         {isModalOpen.open && (
@@ -67,72 +64,47 @@ function App() {
 
 const Main = styled.div`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  width: 100vw;
+  justify-content: center;
   height: 100vh;
 `;
 
 const Issue = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 1000px;
-  height: 400px;
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
 `;
 
 const Title = styled.span`
-  padding: 10px;
-  font-size: 50px;
-  font-weight: bold;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
 `;
 
 const Boards = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  gap: 10px;
-  margin-bottom: 100px;
-  div {
-    display: flex;
-    flex-direction: column;
-  }
+  gap: 1rem;
+`;
+
+const Board = styled.div`
+  width: 300px;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa;
 `;
 
 const InputModalBtn = styled.button`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 50px;
-  padding: 10px 0px 5px 0px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  :hover {
-    background-color: var(--gray6);
-  }
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #f1f3f5;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 `;
 
 const BoardTitle = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 30px;
+  font-size: 1.2rem;
   font-weight: bold;
-  padding: 5px;
-  border: 1px solid black;
-  border-radius: 10px;
-  width: 200px;
-`;
-
-const BoardItem = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  padding: 20px;
-  border: 1px solid black;
+  margin-bottom: 0.5rem;
 `;
 
 const ModalArea = styled.div`

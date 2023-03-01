@@ -1,36 +1,17 @@
-import React, { useEffect } from "react";
-import { useRecoilState } from "recoil";
+import React from "react";
 import styled from "styled-components";
-import { kanbanBoardData } from "../recoil/atoms";
 
-const Main = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  padding: 5px;
-  border: 1px solid black;
-  color: black;
-  button {
-    border: 1px solid black;
-  }
+const Main = styled.li`
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 `;
 
 function BoardItem({ ...props }) {
-  const { issue, issueList } = props;
-
-  const [prevData, setPrevData] = useRecoilState(kanbanBoardData);
-
-  const boardItemDelete = (id) => {
-    const createBoard = prevData.filter((x) => x.dateTime !== id);
-    console.log(createBoard);
-    setPrevData(createBoard);
-  };
-  return (
-    <Main>
-      <div>{issue?.title}</div>
-      {/* <button onClick={() => boardItemDelete(data.data.dateTime)}>삭제</button> */}
-    </Main>
-  );
+  const { item, key } = props;
+  return <Main key={key}>{item?.title}</Main>;
 }
 
 export default BoardItem;
