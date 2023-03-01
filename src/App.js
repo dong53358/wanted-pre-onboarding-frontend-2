@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import BoardItem from "./components/BoardItem";
 import Modal from "./components/Modal";
@@ -12,6 +12,50 @@ function App() {
     if (localStorage.getItem("issueList")) {
       setIssueList(JSON.parse(localStorage.getItem("issueList")));
     }
+  };
+
+  const [dragging, setDragging] = useState(false);
+
+  const dragItem = useRef();
+  const dragNode = useRef();
+
+  const handleDragStart = (e, params) => {
+    dragItem.current = params;
+    dragNode.current = e.target;
+    dragNode.current?.addEventListener("dragend", handleDragEnd);
+    setDragging(true);
+  };
+
+  const handleDragEnter = (e, params) => {
+    const currentItem = dragItem.current;
+    if (e.target !== dragNode.current) {
+      setIssueList((prev) => {
+        const newList = JSON.parse(JSON.stringify(prev)); // deep copy
+        const targetList = newList[params.issuelistId]?.items;
+        const selectedList = newList[currentItem?.issuelistId]?.items;
+        targetList?.splice(
+          params.itemId,
+          0,
+          selectedList?.splice(currentItem?.itemId, 1)[0]
+        );
+        targetList[0].status =
+          params.issuelistId === 0
+            ? "todo"
+            : params.issuelistId === 1
+            ? "progress"
+            : "complete";
+        dragItem.current = params;
+        return newList;
+      });
+      localStorage.setItem("issueList", JSON.stringify(issueList));
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDragging(false);
+    dragNode.current?.removeEventListener("dragend", handleDragEnd);
+    dragItem.current = null;
+    dragNode.current = null;
   };
 
   const modalOpen = (status) => {
@@ -32,15 +76,35 @@ function App() {
       <Issue>
         <Title>Issue</Title>
         <Boards>
-          {issueList.map((issuelist, index) => (
-            <Board key={index}>
+          {issueList.map((issuelist, issuelistId) => (
+            <Board key={issuelistId}>
               <InputModalBtn onClick={() => modalOpen(issuelist?.title)}>
                 + 추가
               </InputModalBtn>
               <BoardTitle>{issuelist.title}</BoardTitle>
-              <ul>
-                {issuelist.items.map((item, index) => (
-                  <BoardItem key={index} item={item} className="item">
+              <ul
+                onDragEnter={
+                  dragging && dragItem.current.issuelistId !== issuelistId
+                    ? (e) => handleDragEnter(e, { issuelistId, itemId: 0 })
+                    : null
+                }
+                style={{ height: "100%" }}
+              >
+                {issuelist.items.map((item, itemId) => (
+                  <BoardItem
+                    key={itemId}
+                    item={item}
+                    itemId={itemId}
+                    getIssueList={getIssueList}
+                    issuelist={issuelist}
+                    issuelistId={issuelistId}
+                    dragging={dragging}
+                    handleDragStart={handleDragStart}
+                    handleDragEnter={handleDragEnter}
+                    issueList={issueList}
+                    dragItem={dragItem}
+                    className="item"
+                  >
                     {item.title}
                   </BoardItem>
                 ))}
@@ -77,8 +141,7 @@ const Issue = styled.div`
 `;
 
 const Title = styled.span`
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
 `;
 
 const Boards = styled.div`
