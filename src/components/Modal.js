@@ -3,32 +3,45 @@ import styled from "styled-components";
 import useInput from "../hooks/useInput";
 
 function Modal({ ...props }) {
-  const { modalClose, issueList, status } = props;
+  const { type, modalClose, issueList, status, item } = props;
   const STATUS_INDEX = status === "todo" ? 0 : status === "progress" ? 1 : 2;
 
-  const [issueInputValue, setIssueInputValue, reset] = useInput({
-    id: Date.now(),
-    title: "",
-    manager: "",
-    description: "",
-    status: "",
-    date: "",
+  const [issueInputValue, setIssueInputValue] = useInput({
+    id: item?.id || Date.now(),
+    title: item?.title || "",
+    manager: item?.manager || "",
+    description: item?.description || "",
+    status: status,
+    date: item?.date || "",
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    issueList[STATUS_INDEX].items = [
-      ...issueList[STATUS_INDEX].items,
-      issueInputValue,
-    ];
+    const issueIndex = issueList[STATUS_INDEX].items?.findIndex(
+      (item) => item.id === issueInputValue.id
+    );
+    type === "ADD"
+      ? (issueList[STATUS_INDEX].items = [
+          ...issueList[STATUS_INDEX].items,
+          issueInputValue,
+        ])
+      : (issueList[STATUS_INDEX].items[issueIndex] = issueInputValue);
+    localStorage.setItem("issueList", JSON.stringify(issueList));
 
+    modalClose();
+  };
+
+  const deleteItem = () => {
+    issueList[STATUS_INDEX].items = issueList[STATUS_INDEX].items.filter(
+      (item) => item.id !== issueInputValue.id
+    );
     localStorage.setItem("issueList", JSON.stringify(issueList));
 
     modalClose();
   };
 
   return (
-    <Main>
+    <>
       <InputForm onSubmit={handleSubmit}>
         <IssueTitle>ISSUE 등록</IssueTitle>
         <label>제목</label>
@@ -64,42 +77,31 @@ function Modal({ ...props }) {
         />
 
         <BtnArea>
-          <ResetBtn type="button" onClick={reset}>
-            초기화
-          </ResetBtn>
+          <DeleteBtn type="button" onClick={deleteItem}>
+            삭제
+          </DeleteBtn>
           <SubmitBtn type="sumbit">저장</SubmitBtn>
         </BtnArea>
       </InputForm>
       <Overlay onClick={modalClose} />
-    </Main>
+    </>
   );
 }
-
-const Main = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
-
-const IssueTitle = styled.div`
-  display: flex;
-  justify-content: center;
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 10px;
-`;
-
 const InputForm = styled.form`
+  position: fixed;
   display: flex;
   flex-direction: column;
-  background-color: white;
-  border-radius: 10px;
+  top: 50%;
+  left: 50%;
+  padding: 20px;
   width: 500px;
-  padding: 15px;
+  transform: translate(-50%, -50%);
   z-index: 10;
+  background-color: var(--white);
+  border-radius: 10px;
   label {
+    text-align: start;
+    margin-left: 10px;
     margin-bottom: 10px;
     font-weight: bold;
   }
@@ -124,12 +126,21 @@ const InputForm = styled.form`
     }
   }
 `;
+
+const IssueTitle = styled.div`
+  display: flex;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 10px;
+`;
+
 const BtnArea = styled.div`
   display: flex;
   justify-content: center;
 `;
 
-const ResetBtn = styled.button`
+const DeleteBtn = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;

@@ -103,6 +103,8 @@ function App() {
                     handleDragEnter={handleDragEnter}
                     issueList={issueList}
                     dragItem={dragItem}
+                    modalClose={modalClose}
+                    modalOpen={modalOpen}
                     className="item"
                   >
                     {item.title}
@@ -116,6 +118,7 @@ function App() {
       <ModalArea>
         {isModalOpen.open && (
           <Modal
+            type="ADD"
             modalClose={modalClose}
             issueList={issueList}
             status={isModalOpen.status}

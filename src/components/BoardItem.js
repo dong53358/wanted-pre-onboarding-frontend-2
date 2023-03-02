@@ -1,34 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
+import Modal from "./Modal";
 
 function BoardItem({ ...props }) {
   const {
     getIssueList,
     item,
     itemId,
-    issuelist,
     issuelistId,
     dragging,
     handleDragStart,
     handleDragEnter,
     dragItem,
   } = props;
+  const [isEdit, setIsEdit] = useState(false);
+
+  const issueList = JSON.parse(localStorage.getItem("issueList"));
+
+  const editOpen = () => {
+    setIsEdit(true);
+  };
+  const modalClose = () => {
+    setIsEdit(false);
+    getIssueList();
+  };
+
   return (
-    <Main
-      key={itemId}
-      draggable
-      onDragStart={(e) => handleDragStart(e, { issuelistId, itemId })}
-      onDragEnter={
-        dragging && dragItem.current.issuelistId === issuelistId
-          ? (e) => handleDragEnter(e, { issuelistId, itemId })
-          : null
-      }
-    >
-      <ItemTitle>{item?.title}</ItemTitle>
-    </Main>
+    <>
+      <IssueItemContainer
+        onClick={editOpen}
+        key={itemId}
+        draggable
+        onDragStart={(e) => handleDragStart(e, { issuelistId, itemId })}
+        onDragEnter={
+          dragging && dragItem.current.issuelistId === issuelistId
+            ? (e) => handleDragEnter(e, { issuelistId, itemId })
+            : null
+        }
+      >
+        <ItemTitle>{item?.title}</ItemTitle>
+      </IssueItemContainer>
+      {isEdit && (
+        <Modal
+          type="EDIT"
+          item={item}
+          modalClose={modalClose}
+          issueList={issueList}
+          status={item.status}
+        />
+      )}
+    </>
   );
 }
-const Main = styled.li`
+const IssueItemContainer = styled.li`
   padding: 0.5rem;
   margin-bottom: 0.5rem;
   border-radius: 0.5rem;
